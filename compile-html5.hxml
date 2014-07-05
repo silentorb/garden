@@ -1,0 +1,7 @@
+-cp src
+-cp E:/dev/metahub/src
+-lib promhx
+-D html5
+-js output/html5/garden.js
+-main garden.Main
+-debug

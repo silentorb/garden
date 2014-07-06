@@ -17,6 +17,7 @@
   <classpaths>
     <class path="src" />
     <class path="..\..\Dev\metahub\src" />
+    <class path="..\..\Programs\HaxeToolkit\haxe\lib\promhx\1,0,4\src\main" />
   </classpaths>
   <!-- Build options -->
   <build>

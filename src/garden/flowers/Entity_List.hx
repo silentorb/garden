@@ -14,26 +14,21 @@ class Entity_List extends Flower {
 	var title:String;
 	var query:Query;
 
-	public function new(title:String,query:Query, garden:Garden) {
+	public function new(title:String, query:Query, garden:Garden) {
 		super();
 		this.title = title;
 		this.query = query;
-		element = new JQuery('<div />');
-		var text = new JQuery('<h2 />');
+		element = new JQuery(garden.blocks['trellis-query']);
+		var text = element.find('.title');
 		text.text(title);
-		//text.width(200);
-
-		//var format = new TextFormat();
-    //format.font = "Arial";
-    //format.size = 24;
-    ////format.color = 0xBBBBBB;
-    //text.setTextFormat(format);
-		element.append(text);
+		element.find('.create').click(function (e) {
+			var view = new Entity_Flower({}, query.trellis, garden);
+			garden.set_main_view(view);	
+		});
 		
 		query.run(garden.remote)
 		.then(function(response) {
 			var list = new List();
-			//list.element.y = 30;
 			var objects = response.objects;
 			element.append(list.element);
 			for (i in Reflect.fields(objects)) {

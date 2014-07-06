@@ -8,7 +8,7 @@ td {
 }
 
 #main {
-    display:table;
+    display: table;
 }
 
 #content {
@@ -17,4 +17,14 @@ td {
 
 field {
     display: block;
+}
+
+.icon {
+    margin-left: 10pt;
+    width: 12pt;
+    cursor: pointer;
+}
+
+.item img {
+    /*float:right;*/
 }

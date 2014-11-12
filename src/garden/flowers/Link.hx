@@ -21,7 +21,7 @@ class Link extends Flower
 		//text.width = 150;
 		if (title != null)
 			text.text(title);
-			
+
 		element = new JQuery('<div />');
 		element.append(text);
 
@@ -36,7 +36,7 @@ class Link extends Flower
 		//this.height = text.textHeight;
 
 		//element.addChild(text);
-		element.click(function(e) {
+		text.click(function(e) {
 			e.preventDefault();
 			this.channel.goto();
 		});

@@ -36,13 +36,17 @@ class Garden {
 			var all = new JQuery(response.response);
 			for (child in all.children()) {
 				var name = child.attr('name');
-				while (name == null) 
+				while (name == null)
 				{
 					child = new JQuery(child.children()[0]);
 					name = child.attr('name');
-				}				
+				}
 				blocks[name] = child[0].outerHTML;
 			}
+
+			return null;
+		})
+		.then(function(info) {
 			return remote.login('cj', 'pass');
 		})
 		.then(function(response) {
@@ -57,7 +61,7 @@ class Garden {
 				populate_list(namespace.trellises);
 			});
 		});
-		
+
 	}
 
 	function populate_list(trellises:Map<String, Trellis>) {

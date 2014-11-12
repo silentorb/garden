@@ -6,6 +6,7 @@ import garden.flowers.Link;
 import bloom.List;
 import haxe.ds.StringMap;
 import metahub.Hub;
+import metahub.schema.Load_Settings;
 import metahub.schema.Schema;
 import metahub.schema.Trellis;
 import network.Http;
@@ -26,12 +27,14 @@ class Garden {
 	public var blocks = new Map<String, String>();
 
 	public var remote:Http;
+	public var local:Http;
 
 	public function new() {
 		hub = new Hub();
-		remote = new Http('localhost/garden');
+		local = new Http('localhost/garden');
+		remote = new Http('localhost:3000');
 
-		remote.get('blocks/blocks.html')
+		local.get('blocks/blocks.html')
 		.then(function(response) {
 			var all = new JQuery(response.response);
 			for (child in all.children()) {
@@ -55,13 +58,12 @@ class Garden {
 			.then(function(response) {
 				trace('populating list...');
 				var namespace = hub.schema.add_namespace('garden');
-				hub.schema.load_trellises(response.trellises, namespace);
+				hub.schema.load_trellises(response.trellises, new Load_Settings(namespace));
 				trace('r', Reflect.fields(response));
 				trace('trellises', Reflect.fields(response.trellises));
 				populate_list(namespace.trellises);
 			});
 		});
-
 	}
 
 	function populate_list(trellises:Map<String, Trellis>) {

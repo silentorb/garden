@@ -1,5 +1,6 @@
 package garden.flowers;
 import bloom.Flower;
+import garden.channels.Trellis_Channel;
 import metahub.schema.Property;
 import metahub.schema.Trellis;
 import js.JQuery;
@@ -33,7 +34,12 @@ class Entity_Flower extends Flower
 		
 		element.find('.submit').click(function(e) {
 			e.preventDefault();
-			update(seed, trellis, garden);
+			plant(seed, trellis, garden);
+		});
+		
+		element.find('.delete').click(function(e) {
+			e.preventDefault();
+			delete_seed(seed, trellis, garden);
 		});
 	}
 	
@@ -114,15 +120,16 @@ class Entity_Flower extends Flower
 			var result:Dynamic = cast {
 				_removed_: true
 			};
-			var identity = property.other_trellis.identity_property.name;
-			Reflect.setField(result, identity, Reflect.field(seed, identity));
+			property.other_trellis.copy_identity(seed, result);
+			//var identity = property.other_trellis.identity_property.name;
+			//Reflect.setField(result, identity, Reflect.field(seed, identity));
 			return result;
 		}
 		
 		return property.other_trellis.get_identity(seed);
 	}
 	
-	function update(source:Dynamic, trellis:Trellis,garden:Garden) {
+	function plant(source:Dynamic, trellis:Trellis,garden:Garden) {
 		var seed:Dynamic = cast { };
 		var properties = trellis.get_all_properties();
 		for (property in properties) {
@@ -142,6 +149,21 @@ class Entity_Flower extends Flower
 		garden.remote.post_json('vineyard/update', data)
 		.then(function(response) {
 			trace('Success!');
+		});
+	}
+	
+	function delete_seed(source:Dynamic, trellis:Trellis, garden:Garden) {
+		var seed:Dynamic = cast { trellis: trellis.name, _deleted_: true };
+		trellis.copy_identity(source, seed);
+		var data = {
+			objects: [ seed ]
+		};
+		
+		garden.remote.post_json('vineyard/update', data)
+		.then(function(response) {
+			trace('deleted!');
+			var channel = new Trellis_Channel(trellis, garden);
+			channel.goto();
 		});
 	}
 	

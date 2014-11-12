@@ -1,4 +1,6 @@
 package network;
+import js.Browser;
+import js.JQuery;
 import promhx.Deferred;
 import promhx.Promise.Promise;
 import haxe.Json;
@@ -49,27 +51,51 @@ class Http {
 
   function http(url:String, data:String, post:Bool):Promise<Response_Info> {
     var def = new Deferred<Response_Info>();
-    var r = new haxe.Http(create_url(url));
-		if (cookies != null) {
-			trace('Cookie', cookies);
-			r.addHeader('Cookie', cookies);
-		}		
-    r.onError = function(response) {
-			//trace('error', response);
-			//trace('headers2', r.responseHeaders);
-      //def.promise().reject(response);
-			throw response;
-    }
-    r.onData = function(response) {
-			//trace('http', response);
-			haxe.Timer.delay(function() def.resolve({ request: r, response: response }), 1);
-      //def.resolve(Json.parse(response));
-    }
-		if (post)
-			r.setPostData(data);
+		
+		#if js
+			//r.setHeader('Origin', Browser.location.origin);
+			var jquery:Dynamic = js.JQuery;
+			jquery.ajax({
+			  type: post ? 'POST' : 'GET',
+				url: url,
+				data: data,
+				contentType: 'application/json',
+				dataType: 'text',
+				success: function(response) {
+					haxe.Timer.delay(function() def.resolve({ request: null, response: response }), 1);
+				},
+				xhrFields: {
+					withCredentials: true
+				},
+				error: function(response, error) {
+					//console.log('ERROR:', error);
+					throw error;
+				}
+			});
+		#else
+			var r = new haxe.Http(create_url(url));
+			if (cookies != null) {
+				trace('Cookie', cookies);
+				r.addHeader('Cookie', cookies);
+			}		
+			r.onError = function(response) {
+				//trace('error', response);
+				//trace('headers2', r.responseHeaders);
+				//def.promise().reject(response);
+				throw response;
+			}
+			r.onData = function(response) {
+				//trace('http', response);
+				haxe.Timer.delay(function() def.resolve({ request: r, response: response }), 1);
+				//def.resolve(Json.parse(response));
+			}
+			if (post)
+				r.setPostData(data);
 
-		r.setHeader('Content-Type', 'application/json');
-    r.request(post);
+			r.setHeader('Content-Type', 'application/json');
+			
+			r.request(post);
+		#end
 
     return def.promise();
   }
